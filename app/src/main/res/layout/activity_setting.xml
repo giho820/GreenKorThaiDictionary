@@ -1,0 +1,165 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/c_FFFFFF"
+    android:orientation="vertical"
+    tools:context="com.ph.korthaidictionary.act.SettingAct">
+
+    <include
+        layout="@layout/activity_header"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_56"
+        android:layout_gravity="center_horizontal" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_50"
+        android:layout_marginTop="@dimen/dp_8">
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="left"
+            android:layout_marginLeft="@dimen/dp_16"
+            android:layout_marginTop="@dimen/dp_5">
+
+            <TextView
+                android:id="@+id/act_setting_guide_version_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/act_recent_version"
+                android:textColor="@color/c_E8185C"
+                android:textSize="@dimen/dp_10" />
+
+            <TextView
+                android:id="@+id/act_setting_title_version_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/act_setting_guide_version_tv"
+                android:alpha="0.87"
+                android:text="@string/act_info_version"
+                android:textColor="@color/c_000000"
+                android:textSize="@dimen/dp_16" />
+
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/act_setting_version_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right|center_vertical"
+            android:layout_marginRight="@dimen/dp_16"
+            android:alpha="0.87"
+            android:text="v.1.0.0"
+            android:textColor="@color/c_000000"
+            android:textSize="@dimen/dp_19" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_50">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left|center_vertical"
+            android:layout_marginLeft="@dimen/dp_16"
+            android:alpha="0.87"
+            android:text="@string/act_info_director"
+            android:textColor="@color/c_000000"
+            android:textSize="@dimen/dp_16" />
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right|center_vertical"
+            android:layout_marginRight="@dimen/dp_16"
+            android:alpha="0.87"
+            android:text="@string/act_director"
+            android:textColor="@color/c_000000"
+            android:textSize="@dimen/dp_19" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_50"
+        android:background="@drawable/list_selector"
+        android:clickable="true"
+        android:onClick="onClickAppendix">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left|center_vertical"
+            android:layout_marginLeft="@dimen/dp_16"
+            android:alpha="0.87"
+            android:text="@string/act_info_appendix"
+            android:textColor="@color/c_000000"
+            android:textSize="@dimen/dp_16" />
+
+
+        <ImageView
+            android:layout_width="@dimen/dp_24"
+            android:layout_height="@dimen/dp_24"
+            android:layout_gravity="right|center_vertical"
+            android:layout_marginRight="@dimen/dp_16"
+            android:background="@drawable/item_next_n" />
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/dp_24"
+        android:gravity="left"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="@dimen/dp_48"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/dp_24"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/act_setting_blue_btn"
+                android:layout_width="@dimen/dp_48"
+                android:layout_height="@dimen/dp_48"
+                android:layout_gravity="center_vertical"
+                android:background="@drawable/act_btn_icon_blue"
+                android:onClick="onClickApp" />
+
+            <TextView
+                android:layout_width="@dimen/dp_48"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp_2"
+                android:gravity="center"
+                android:text="@string/act_app_blue"
+                android:textSize="@dimen/dp_12" />
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="@dimen/dp_48"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/dp_24"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/act_setting_red_btn"
+                android:layout_width="@dimen/dp_48"
+                android:layout_height="@dimen/dp_48"
+                android:layout_gravity="center_vertical"
+                android:background="@drawable/act_btn_icon_red"
+                android:onClick="onClickApp" />
+
+            <TextView
+                android:layout_width="@dimen/dp_48"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp_2"
+                android:gravity="center"
+                android:text="@string/act_app_red"
+                android:textSize="@dimen/dp_12" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/dp_72"
+        android:layout_gravity="center"
+        android:background="@drawable/list_selector"
+        android:orientation="horizontal"
+        android:weightSum="1">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="@dimen/dp_16"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/item_pronu_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:textColor="@color/c_000000"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/item_thai_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp_9.66"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:textColor="@color/c_000000"
+                android:textSize="17sp" />
+
+        </LinearLayout>
+
+        <ImageView
+            android:layout_width="@dimen/dp_24"
+            android:layout_height="@dimen/dp_24"
+            android:layout_gravity="center_vertical|right"
+            android:layout_marginRight="@dimen/dp_16"
+            android:layout_weight="0"
+            android:background="@drawable/item_next_n" />
+
+    </LinearLayout>
+
+</FrameLayout>
+

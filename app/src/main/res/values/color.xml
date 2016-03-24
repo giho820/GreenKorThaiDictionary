@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Kor and Thai dictionary -->
+    <!-- color header bg -->
+    <color name="c_408BEB">#408BEB</color>
+    <color name="c_FFFFFF">#FFFFFF</color>
+    <color name="c_FAFAFA">#FAFAFA</color>
+    <color name="c_F9F9F9">#F9F9F9</color>
+    <color name="c_262626">#262626</color>
+    <color name="c_000000">#000000</color>
+    <color name="c_DF4E4D">#DF4E4D</color>
+    <color name="c_68E0A3">#68E0A3</color>
+
+    <!-- main_01 -->
+    <color name="c_5A7AAC">#5A7AAC</color>
+    <!-- vari_01 -->
+    <color name="c_3E6098">#3E6098</color>
+    <!-- vari_02 -->
+    <color name="c_E6EAF2">#E6EAF2</color>
+    <!-- vari_03 -->
+    <color name="c_869CBE">#869CBE</color>
+    <!-- vari_04 -->
+    <color name="c_3C4E6A">#3C4E6A</color>
+    <!-- vari_04 (80%) -->
+    <color name="c_CC3C4E6A">#CC3C4E6A</color>
+    <!-- vari_05 -->
+    <color name="c_203C66">#203C66</color>
+    <!-- point_01 -->
+    <color name="c_E8185C">#E8185C</color>
+    <!-- sub_01 -->
+    <color name="c_5D5D5D">#5D5D5D</color>
+
+</resources>
