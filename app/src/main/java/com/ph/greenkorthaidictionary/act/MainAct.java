@@ -1,6 +1,5 @@
 package com.ph.greenkorthaidictionary.act;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -8,7 +7,6 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.speech.tts.TextToSpeech;
@@ -22,7 +20,6 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.ph.greenkorthaidictionary.GreenKorThaiDicApplication;
 import com.ph.greenkorthaidictionary.ParentAct;
 import com.ph.greenkorthaidictionary.R;
 import com.ph.greenkorthaidictionary.async.DownloadAsync;
@@ -50,7 +47,6 @@ import com.util.Util;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 
 
 public class MainAct extends ParentAct implements NetworkListener, View.OnClickListener, FragListener, BackgroundResultReceiver.Receiver {
@@ -96,9 +92,13 @@ public class MainAct extends ParentAct implements NetworkListener, View.OnClickL
     private DownloadAsync downloadAsync;
     private ServiceInfoDto serviceInfoDto;
 
+    // about tts
+    public static boolean doesTtsExists = false; //구글 tts 패키지가 설치되어있는지의 여부를 확인
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
 
         // header
@@ -173,8 +173,11 @@ public class MainAct extends ParentAct implements NetworkListener, View.OnClickL
     protected void onResume() {
         super.onResume();
 
-        //tts 초기화
-        initTTS();
+        if (checkIfGoogleTtsHasBeenInstalled() == false) {
+            installGoogleTts();
+        } else {
+            updateGoogleTts();
+        }
 
 //        Intent intent = new Intent(this, NetworkIntentService.class);
 //        intent.putExtra("os", os);
@@ -681,214 +684,105 @@ public class MainAct extends ParentAct implements NetworkListener, View.OnClickL
         builder.show();
     }
 
-    public void initTTS() {
+    public boolean checkIfGoogleTtsHasBeenInstalled() {
         //설치된 패키지 돌면서 google android tts 설치되어있는지 확인
-        final PackageManager pm = this.getPackageManager();
+        doesTtsExists = false;
+        final PackageManager pm = getPackageManager();
         List<ApplicationInfo> packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
 
         for (ApplicationInfo packageInfo : packages) {
             if ("com.google.android.tts".equalsIgnoreCase(packageInfo.packageName)) {
-//                DebugUtil.showDebug("targetSdkVersion : " + packageInfo.targetSdkVersion + " , Build.VERSION_CODES.LOLLIPOP : " + Build.VERSION_CODES.LOLLIPOP);
-                GreenKorThaiDicApplication.doesTtsExists = true;
+                doesTtsExists = true;
+                DebugUtil.showDebug("tts, :: com.google.android.tts 설치 되어있음");
                 break;
             }
         }
 
-        if (GreenKorThaiDicApplication.doesTtsExists) {
-            try {
-                PackageInfo packageInfo = this.getPackageManager().getPackageInfo("com.google.android.tts", 0);
-                DebugUtil.showDebug("com.google.android.tts 버젼 : " + packageInfo.versionName + ", versionCode : " + packageInfo.versionCode);
+        return doesTtsExists;
+    }
 
-                //버젼 업데이트하기
-                if (packageInfo.versionCode < 210308140) {
-                    DebugUtil.showDebug("com.google.android.tts 버젼이 낮음 ");
-
-                    android.support.v7.app.AlertDialog alertDialog = new android.support.v7.app.AlertDialog.Builder(this).create();
-                    alertDialog.setTitle("Google TTS 엔진 설치");
-                    alertDialog.setMessage("태국어 음성지원 이용시 google tts 엔진을 업데이트 해야합니다 업데이트 화면으로 이동하시겠습니까?");
-                    alertDialog.setButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE, "네",
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.dismiss();
-                                    //패키지 최신 버젼으로 업데이트하기
-                                    Intent intentUpdate = new Intent(Intent.ACTION_VIEW);
-                                    intentUpdate.setData(Uri.parse("market://details?id=" + "com.google.android.tts"));
-                                    if (this == null) {
-                                        DebugUtil.showDebug("parentAct is null");
-                                    } else {
-                                        DebugUtil.showDebug("parentAct is not null ");
-                                        MoveActUtil.moveActivity(MainAct.this, intentUpdate, -1, -1, false, false);
-                                    }
-                                }
-                            });
-                    alertDialog.setButton(android.support.v7.app.AlertDialog.BUTTON_NEGATIVE, "아니오",
-                            new DialogInterface.OnClickListener() {
-
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.dismiss();
-                                }
-                            });
-                    alertDialog.show();
-
-
-                }
-
-                //tts 객체 생성하기
-                if (GreenKorThaiDicApplication.tts == null) {
-                    GreenKorThaiDicApplication.tts = new TextToSpeech(this, GreenKorThaiDicApplication.context, "com.google.android.tts");
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        GreenKorThaiDicApplication.tts.setLanguage(Locale.forLanguageTag("th"));
+    public void installGoogleTts() {
+        android.support.v7.app.AlertDialog alertDialog = new android.support.v7.app.AlertDialog.Builder(this).create();
+        alertDialog.setTitle("Install Google TTS Engine");
+        alertDialog.setMessage("If you want to use a Pronunciation Service, You must install the google tts engine. \nWould you like to go to the install page?");
+        alertDialog.setButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE, "Yes",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        //패키지 최신 버젼으로 업데이트하기
+                        Intent intentUpdate = new Intent(Intent.ACTION_VIEW);
+                        intentUpdate.setData(Uri.parse("market://details?id=" + "com.google.android.tts"));
+                        if (this == null) {
+                            DebugUtil.showDebug("parentAct is null");
+                        } else {
+                            DebugUtil.showDebug("parentAct is not null ");
+                            MoveActUtil.moveActivity(MainAct.this, intentUpdate, -1, -1, false, false);
+                        }
                     }
-                }
+                });
+        alertDialog.setButton(android.support.v7.app.AlertDialog.BUTTON_NEGATIVE, "No",
+                new DialogInterface.OnClickListener() {
 
-                //tts_kor 객체 생성하기
-                if (GreenKorThaiDicApplication.tts_kor == null) {
-                    GreenKorThaiDicApplication.tts_kor = new TextToSpeech(this, GreenKorThaiDicApplication.context, "com.google.android.tts");
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        GreenKorThaiDicApplication.tts_kor.setLanguage(Locale.KOREA);
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
                     }
-                }
+                });
+        alertDialog.show();
+    }
 
-            } catch (PackageManager.NameNotFoundException e) {
-                e.printStackTrace();
-            }
+    public void updateGoogleTts() {
+        try {
+            PackageInfo packageInfo = getPackageManager().getPackageInfo("com.google.android.tts", 0);
+            DebugUtil.showDebug("com.google.android.tts 버젼 : " + packageInfo.versionName + ", versionCode : " + packageInfo.versionCode);
 
+            //버젼 업데이트하기
+            if (packageInfo.versionCode < 210308140) {
+                DebugUtil.showDebug("com.google.android.tts 버젼이 낮음 ");
 
-        } else {
-            DebugUtil.showDebug("tts, 없음");
-
-            android.support.v7.app.AlertDialog alertDialog = new android.support.v7.app.AlertDialog.Builder(this).create();
-            alertDialog.setTitle("Google TTS 엔진 설치");
-            alertDialog.setMessage("태국어 음성지원 이용시 google tts 엔진을 설치해야합니다 설치화면으로 이동하시겠습니까?");
-            alertDialog.setButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE, "네",
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                            //패키지 최신 버젼으로 업데이트하기
-                            Intent intentUpdate = new Intent(Intent.ACTION_VIEW);
-                            intentUpdate.setData(Uri.parse("market://details?id=" + "com.google.android.tts"));
-                            if (this == null) {
-                                DebugUtil.showDebug("parentAct is null");
-                            } else {
-                                DebugUtil.showDebug("parentAct is not null ");
-                                MoveActUtil.moveActivity(MainAct.this, intentUpdate, -1, -1, false, false);
+                android.support.v7.app.AlertDialog alertDialog = new android.support.v7.app.AlertDialog.Builder(this).create();
+                alertDialog.setTitle("Update Google TTS Engine");
+                alertDialog.setMessage("If you want to use a Pronunciation Service, You must update the google tts engine. \n" +
+                        "Would you like to go to the update page?");
+                alertDialog.setButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE, "Yes",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                                //패키지 최신 버젼으로 업데이트하기
+                                Intent intentUpdate = new Intent(Intent.ACTION_VIEW);
+                                intentUpdate.setData(Uri.parse("market://details?id=" + "com.google.android.tts"));
+                                if (this == null) {
+                                    DebugUtil.showDebug("parentAct is null");
+                                } else {
+                                    DebugUtil.showDebug("parentAct is not null ");
+                                    MoveActUtil.moveActivity(MainAct.this, intentUpdate, -1, -1, false, false);
+                                }
                             }
-                        }
-                    });
-            alertDialog.setButton(android.support.v7.app.AlertDialog.BUTTON_NEGATIVE, "아니오",
-                    new DialogInterface.OnClickListener() {
-
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    });
-            alertDialog.show();
-        }
-
-
-        DebugUtil.showDebug("DetailItemFrag, newInstance :  " + GreenKorThaiDicApplication.tts);
-        DebugUtil.showDebug("DetailItemFrag, newInstance :  " + GreenKorThaiDicApplication.tts_kor);
-    }
-
-
-    @SuppressLint("NewApi")
-    public static void speakOutThai(String ThaiStringToSpeak) {
-        if (GreenKorThaiDicApplication.tts == null) {
-            DebugUtil.showDebug("tts is null");
-            GreenKorThaiDicApplication.tts = new TextToSpeech(GreenKorThaiDicApplication.context, GreenKorThaiDicApplication.context);
-            HashMap<String, String> map = new HashMap<>();
-            map = setTTS(ThaiStringToSpeak);
-            GreenKorThaiDicApplication.tts.speak(ThaiStringToSpeak, TextToSpeech.QUEUE_FLUSH, map);
-            return;
-        } else if (!TextUtil.isNull(ThaiStringToSpeak)) {
-            HashMap<String, String> map = new HashMap<>();
-            map = setTTS(ThaiStringToSpeak);
-            GreenKorThaiDicApplication.tts.speak(ThaiStringToSpeak, TextToSpeech.QUEUE_FLUSH, map);
-        }
-    }
-
-
-    public static HashMap<String, String> setTTS(String _ThaiStringToSpeak) {
-        HashMap<String, String> map = new HashMap<>();
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            GreenKorThaiDicApplication.tts.speak(_ThaiStringToSpeak, TextToSpeech.QUEUE_FLUSH, null, null);
-            GreenKorThaiDicApplication.tts.setEngineByPackageName("com.google.android.tts");
-            GreenKorThaiDicApplication.tts.setLanguage(Locale.forLanguageTag("th"));
-
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-
-            map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "MessageId");
-            GreenKorThaiDicApplication.tts.setEngineByPackageName("com.google.android.tts");
-//                tts.setLanguage(Locale.forLanguageTag("th_TH"));
-
-            Locale[] locales = Locale.getAvailableLocales();
-            List<Locale> localeList = new ArrayList<>();
-            for (Locale locale : locales) {
-                int res = GreenKorThaiDicApplication.tts.isLanguageAvailable(locale);
-                if (res == TextToSpeech.LANG_COUNTRY_AVAILABLE) {
-                    localeList.add(locale);
-                    DebugUtil.showDebug(locale.getLanguage());
-                    if (locale.getLanguage().equalsIgnoreCase("th")) {
-                        GreenKorThaiDicApplication.tts.setLanguage(locale);
-                        DebugUtil.showDebug("DetailItemFrag, speakOut() th 태국어로 할당 됨");
-                    }
-                }
+                        });
+                alertDialog.setButton(android.support.v7.app.AlertDialog.BUTTON_NEGATIVE, "No",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                alertDialog.show();
+            } else {
+                DebugUtil.showDebug("tts, :: tts버젼이 올바르게 설정되어 있습니다. ");
             }
-        }
-        return map;
-    }
-
-
-    @SuppressLint("NewApi")
-    public static void speakOutKor(String ThaiStringToSpeak) {
-        if (GreenKorThaiDicApplication.tts_kor == null) {
-            DebugUtil.showDebug("tts_kor is null");
-            GreenKorThaiDicApplication.tts_kor = new TextToSpeech(GreenKorThaiDicApplication.context, GreenKorThaiDicApplication.context);
-            HashMap<String, String> map = new HashMap<>();
-            map = setTTS_Kor(ThaiStringToSpeak);
-            GreenKorThaiDicApplication.tts_kor.speak(ThaiStringToSpeak, TextToSpeech.QUEUE_FLUSH, map);
-            return;
-        } else if (!TextUtil.isNull(ThaiStringToSpeak)) {
-            HashMap<String, String> map = new HashMap<>();
-            map = setTTS_Kor(ThaiStringToSpeak);
-            GreenKorThaiDicApplication.tts_kor.speak(ThaiStringToSpeak, TextToSpeech.QUEUE_FLUSH, map);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
         }
     }
 
 
-    public static HashMap<String, String> setTTS_Kor(String _ThaiStringToSpeak) {
-        HashMap<String, String> map = new HashMap<>();
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            GreenKorThaiDicApplication.tts_kor.speak(_ThaiStringToSpeak, TextToSpeech.QUEUE_FLUSH, null, null);
-            GreenKorThaiDicApplication.tts_kor.setEngineByPackageName("com.google.android.tts");
-            GreenKorThaiDicApplication.tts_kor.setLanguage(Locale.KOREAN);
 
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-
-            map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "MessageId");
-            GreenKorThaiDicApplication.tts_kor.setEngineByPackageName("com.google.android.tts");
-//                tts.setLanguage(Locale.forLanguageTag("th_TH"));
-//            GreenKorThaiDicApplication.tts_kor.setLanguage(Locale.KOREA);
-
-            Locale[] locales = Locale.getAvailableLocales();
-            List<Locale> localeList = new ArrayList<>();
-            for (Locale locale : locales) {
-                int res = GreenKorThaiDicApplication.tts_kor.isLanguageAvailable(locale);
-                if (res == TextToSpeech.LANG_COUNTRY_AVAILABLE) {
-                    localeList.add(locale);
-                    DebugUtil.showDebug(locale.getLanguage());
-                    if (locale.getLanguage().equalsIgnoreCase("kr")) {
-                        GreenKorThaiDicApplication.tts_kor.setLanguage(locale);
-                        DebugUtil.showDebug("MainAct, setTTS_Kor() 한글로 할당 됨");
-                    }
-                }
-            }
+    public static class TtsThaiListener implements TextToSpeech.OnInitListener {
+        public static int status;
+        @Override
+        public void onInit(int status) {
+            this.status = status;
         }
-        return map;
     }
-
 }
