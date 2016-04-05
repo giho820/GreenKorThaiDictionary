@@ -62,38 +62,6 @@
                 android:textColor="@color/c_262626"
                 android:textSize="24sp" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <ImageView
-                    android:id="@+id/frag_detail_item_thai_pronu_btn"
-                    android:layout_width="@dimen/dp_48"
-                    android:layout_height="@dimen/dp_48"
-                    android:background="@drawable/frag_btn_headset"
-                    android:cropToPadding="false"
-                    android:paddingLeft="@dimen/dp_20" />
-
-<<<<<<< HEAD
-=======
-            <LinearLayout
-                android:id="@+id/m_vwJokeLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:id="@+id/frag_detail_item_thai_pronu_btn"
-                    android:layout_width="@dimen/dp_48"
-                    android:layout_height="@dimen/dp_48"
-                    android:background="@drawable/frag_btn_headset"
-                    android:cropToPadding="false"
-                    andro
-
-            </LinearLayout>
-id:paddingLeft="@dimen/dp_20" />
-
->>>>>>> origin/master
                 <TextView
                     android:id="@+id/frag_detail_item_thai_tv"
                     android:layout_width="wrap_content"
@@ -111,31 +79,18 @@ id:paddingLeft="@dimen/dp_20" />
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-                <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <ImageView
-                    android:id="@+id/frag_detail_item_kor_pronu_btn"
-                    android:layout_width="@dimen/dp_48"
-                    android:layout_height="@dimen/dp_48"
-                    android:background="@drawable/frag_btn_headset"
-                    android:cropToPadding="false"
-                    android:paddingLeft="@dimen/dp_20" />
-        andr    oid:layout_marginLeft="@di    men/dp_8"
-            android:layout_marginRight="@dimen/d    p_8"
-            android:background="@drawable/frag_    detail_item_row"
-            android:orientation="ver    tical">
+            android:layout_marginLeft="@dimen/dp_8"
+            android:layout_marginRight="@dimen/dp_8"
+            android:background="@drawable/frag_detail_item_row"
+            android:orientation="vertical">
 
             <TextView
-                android:layo    ut_width="wrap_content"
-                android:layout_he    ight="wrap_content"
-                android:layout_marginL    eft="@dimen/dp_16"
-                android:layout_marginRi    ght="@dimen/dp_16"
-                android:layout_ma    rginTop="@dimen/dp_23.33"
-                androi    d:text="@string/frag_title
-_k            </LinearLayout>
-
-or"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/dp_16"
+                android:layout_marginRight="@dimen/dp_16"
+                android:layout_marginTop="@dimen/dp_23.33"
+                android:text="@string/frag_title_kor"
                 android:textColor="@color/c_262626"
                 android:textSize="24sp" />
 
