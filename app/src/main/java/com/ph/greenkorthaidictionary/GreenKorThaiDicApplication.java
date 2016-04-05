@@ -5,6 +5,7 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Build;
 import android.speech.tts.TextToSpeech;
+import android.speech.tts.UtteranceProgressListener;
 
 import com.ph.greenkorthaidictionary.util.DebugUtil;
 
@@ -32,7 +33,7 @@ public class GreenKorThaiDicApplication extends Application implements TextToSpe
     public static GreenKorThaiDicApplication getContext() {
         return context;
     }
-
+    
     @Override
     public void onCreate() {
         super.onCreate();
@@ -49,7 +50,39 @@ public class GreenKorThaiDicApplication extends Application implements TextToSpe
                 GreenKorThaiDicApplication.tts.setLanguage(Locale.forLanguageTag("th"));
 
                 GreenKorThaiDicApplication.tts_kor.setEngineByPackageName("com.google.android.tts");
-                GreenKorThaiDicApplication.tts_kor.setLanguage(Locale.KOREAN);
+//                GreenKorThaiDicApplication.tts_kor.setLanguage(Locale.KOREAN);
+                GreenKorThaiDicApplication.tts_kor.setLanguage(Locale.forLanguageTag("ko"));
+
+                tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
+                    @Override
+                    public void onDone(String utteranceId) {
+                        DebugUtil.showDebug("GreenKorThaiDicApplication, tts is done()");
+                    }
+
+                    @Override
+                    public void onError(String utteranceId) {
+                    }
+
+                    @Override
+                    public void onStart(String utteranceId) {
+                    }
+                });
+
+                tts_kor.setOnUtteranceProgressListener(new UtteranceProgressListener() {
+                    @Override
+                    public void onDone(String utteranceId) {
+                        DebugUtil.showDebug("GreenKorThaiDicApplication, tts_kor is done()");
+                    }
+
+                    @Override
+                    public void onError(String utteranceId) {
+                    }
+
+                    @Override
+                    public void onStart(String utteranceId) {
+                    }
+                });
+
             } else if (status == TextToSpeech.ERROR) {
                 DebugUtil.showToast(this, "Sorry! Text To Speech failed...");
                 GreenKorThaiDicApplication.tts.setEngineByPackageName("com.google.android.tts");
