@@ -7,13 +7,10 @@ import android.content.DialogInterface;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Handler;
-import android.provider.Settings;
 
-import com.google.android.vending.licensing.AESObfuscator;
 import com.google.android.vending.licensing.LicenseChecker;
 import com.google.android.vending.licensing.LicenseCheckerCallback;
 import com.google.android.vending.licensing.Policy;
-import com.google.android.vending.licensing.ServerManagedPolicy;
 import com.ph.greenkorthaidictionary.ParentAct;
 import com.ph.greenkorthaidictionary.R;
 import com.ph.greenkorthaidictionary.data.dto.ServiceInfoDto;
@@ -28,7 +25,6 @@ import com.ph.greenkorthaidictionary.network.listener.NetworkListener;
 import com.ph.greenkorthaidictionary.network.util.NetworkConstantUtil;
 import com.ph.greenkorthaidictionary.util.DebugUtil;
 import com.ph.greenkorthaidictionary.util.KorThaiDicConstantUtil;
-import com.ph.greenkorthaidictionary.util.KorThaiDicUtil;
 import com.ph.greenkorthaidictionary.util.MoveActUtil;
 import com.ph.greenkorthaidictionary.util.SharedPreUtil;
 import com.ph.greenkorthaidictionary.util.TextUtil;
@@ -41,7 +37,7 @@ import java.util.HashMap;
  * - check updata database from server
  * - check is there database in database
  */
-public class IntroAct extends ParentAct implements NetworkListener {
+public class IntroAct extends ParentAct implements NetworkListener{
 
     private DatabaseHelper databaseHelper;
 
@@ -78,25 +74,26 @@ public class IntroAct extends ParentAct implements NetworkListener {
         DatabaseConstantUtil.DATABASE_VERSION = 16;
 
         // (debug)
-//        setBase();
+        setBase();
 
-        // 라이센스 인증 여부는 내부 프리퍼런스로 저장을 해서 판단한다. (release)
-        if (KorThaiDicUtil.GetShareIntData(this, KorThaiDicConstantUtil.KEY_SHARED_PREFERENCE.CHECK_LICENSE) != 1) {
-            //인증을 받지 못한 경우
-            progressDialog.show();
-            mHandler = new Handler();
-            mLicenseCheckerCallback = new MyLicenseCheckerCallback();
-            deviceId = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
-            mChecker = new LicenseChecker(this, new ServerManagedPolicy(this, new AESObfuscator(SALT, getPackageName(), deviceId)), BASE64_PUBLIC_KEY);
-            mChecker.checkAccess(mLicenseCheckerCallback);
-        } else {
-            //SharedPreUtil.getInstance().putPreference(KorThaiDicConstantUtil.KEY_SHARED_PREFERENCE.CHECK_DATABASE, 1);
-
-//        if (SharedPreUtil.getInstance().getIntPreference(KorThaiDicConstantUtil.KEY_SHARED_PREFERENCE.CHECK_DATABASE) != 0)
-//            DatabaseConstantUtil.setDatabaseVersion(SharedPreUtil.getInstance().getIntPreference(KorThaiDicConstantUtil.KEY_SHARED_PREFERENCE.CHECK_DATABASE));
-
-            setBase();
-        }
+//        // 라이센스 인증 여부는 내부 프리퍼런스로 저장을 해서 판단한다. (release)
+//        if (KorThaiDicUtil.GetShareIntData(this, KorThaiDicConstantUtil.KEY_SHARED_PREFERENCE.CHECK_LICENSE) != 1) {
+//            //인증을 받지 못한 경우
+//            progressDialog.show();
+//            mHandler = new Handler();
+//            mLicenseCheckerCallback = new MyLicenseCheckerCallback();
+//            deviceId = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
+//            mChecker = new LicenseChecker(this, new ServerManagedPolicy(this, new AESObfuscator(SALT, getPackageName(), deviceId)), BASE64_PUBLIC_KEY);
+//            mChecker.checkAccess(mLicenseCheckerCallback);
+//        } else {
+//            //SharedPreUtil.getInstance().putPreference(KorThaiDicConstantUtil.KEY_SHARED_PREFERENCE.CHECK_DATABASE, 1);
+//
+////        if (SharedPreUtil.getInstance().getIntPreference(KorThaiDicConstantUtil.KEY_SHARED_PREFERENCE.CHECK_DATABASE) != 0)
+////            DatabaseConstantUtil.setDatabaseVersion(SharedPreUtil.getInstance().getIntPreference(KorThaiDicConstantUtil.KEY_SHARED_PREFERENCE.CHECK_DATABASE));
+//
+//
+//            setBase();
+//        }
 
     }
 
@@ -154,7 +151,7 @@ public class IntroAct extends ParentAct implements NetworkListener {
         boolean result = networkResponse.isRESULT();
         int resultCode = networkResponse.getRESULTCODE();
 
-        if(result){
+        if (result) {
             resultIsTrue(idx, resultCode, networkResponse);
         } else {
             resultIsTrue(idx, resultCode, networkResponse);
@@ -162,10 +159,10 @@ public class IntroAct extends ParentAct implements NetworkListener {
 
     }
 
-    public void checkNetworkData(int idx, NetworkResponse networkResponse){
+    public void checkNetworkData(int idx, NetworkResponse networkResponse) {
         DebugUtil.showDebug("IntroAct checkNetworkData()");
 
-        switch(idx){
+        switch (idx) {
             case NetworkConstantUtil.API_IDX._1_GET_SERVICE_INFORMATION:
                 NetworkData serviceInfo = networkResponse.getSERVICEINFO();
                 ServiceInfoDto serviceInfoDto = new ServiceInfoDto();
@@ -184,7 +181,7 @@ public class IntroAct extends ParentAct implements NetworkListener {
 
     public void resultIsTrue(int idx, int resultCode, NetworkResponse networkResponse) {
         DebugUtil.showDebug("MainAct resultIsTrue()");
-        switch (resultCode){
+        switch (resultCode) {
             case NetworkConstantUtil.RESULT_CODE.SUCCESS:
                 DebugUtil.showDebug("MainAct SUCCESS");
                 checkNetworkData(idx, networkResponse);
@@ -194,7 +191,7 @@ public class IntroAct extends ParentAct implements NetworkListener {
 
     public void resultIsFalse(int idx, int resultCode) {
         DebugUtil.showDebug("IntroAct resultIsFalse()");
-        switch (resultCode){
+        switch (resultCode) {
             case NetworkConstantUtil.RESULT_CODE.EMPTY_PARAMETER_THAT_IS_ESSENTIAL:
                 DebugUtil.showDebug("IntroAct EMPTY_PARAMETER_THAT_IS_ESSENTIAL");
                 break;
@@ -240,7 +237,7 @@ public class IntroAct extends ParentAct implements NetworkListener {
     /**
      * create AlertDialog and show this.
      */
-    private void showAlertDialog(){
+    private void showAlertDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setCancelable(false);
 //        builder.setTitle(getResources().getString(R.string.alert_dlgfrag_title_type1));
@@ -295,6 +292,7 @@ public class IntroAct extends ParentAct implements NetworkListener {
         }, 2000);
 
     }
+
 
     // about callback
 
@@ -449,5 +447,7 @@ public class IntroAct extends ParentAct implements NetworkListener {
                 break;
         }
     }
+
+
 
 }
