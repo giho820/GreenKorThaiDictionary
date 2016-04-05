@@ -430,7 +430,7 @@ public class MainAct extends ParentAct implements NetworkListener, View.OnClickL
                     public void run() {
                         DetailItemFrag detailItemFrag = new DetailItemFrag().newInstance(MainAct.this, MainAct.this, MainAct.this);
                         if (korThaiDicDto != null)
-                            detailItemFrag.setKorThaiDicDto(korThaiDicDto);
+                            detailItemFrag.setKorThaiDicDto(korThaiDicDto, MainAct.this);
                         bodyFl.addView(detailItemFrag.getView());
                     }
                 });

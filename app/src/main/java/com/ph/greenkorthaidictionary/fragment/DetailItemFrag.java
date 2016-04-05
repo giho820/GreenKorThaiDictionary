@@ -1,11 +1,16 @@
 package com.ph.greenkorthaidictionary.fragment;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
 import android.text.Html;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
+import android.text.style.ImageSpan;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.ph.greenkorthaidictionary.ParentAct;
@@ -16,6 +21,8 @@ import com.ph.greenkorthaidictionary.data.dto.KorThaiDicDto;
 import com.ph.greenkorthaidictionary.listener.FragListener;
 import com.ph.greenkorthaidictionary.util.DebugUtil;
 import com.ph.greenkorthaidictionary.util.TextUtil;
+
+import java.util.ArrayList;
 
 /**
  * Created by preparkha on 15. 6. 24..
@@ -37,9 +44,8 @@ public class DetailItemFrag extends ParentFrag {
     private TextView itemThaiTv;
     private TextView itemProunTv;
 
-    private ImageView itemKorPronuBtn;
-    private ImageView itemThaiPronuBtn;
-
+    ArrayList<String> splitStrings;
+    ArrayList<String> splitStrings_thai;
 
     public DetailItemFrag() {
 
@@ -57,8 +63,9 @@ public class DetailItemFrag extends ParentFrag {
         return korThaiDicDto;
     }
 
-    public void setKorThaiDicDto(KorThaiDicDto korThaiDicDto) {
+    public void setKorThaiDicDto(KorThaiDicDto korThaiDicDto, Context context) {
         this.korThaiDicDto = korThaiDicDto;
+        this.context = context;
     }
 
     @Nullable
@@ -69,54 +76,142 @@ public class DetailItemFrag extends ParentFrag {
         view = inflater.inflate(R.layout.fragment_detail_item, null);
 
         itemKorTv = (TextView) view.findViewById(R.id.frag_detail_item_kor_tv);
+        itemKorTv.setMovementMethod(LinkMovementMethod.getInstance());
+
         itemThaiTv = (TextView) view.findViewById(R.id.frag_detail_item_thai_tv);
+        itemThaiTv.setMovementMethod(LinkMovementMethod.getInstance());
+
         itemProunTv = (TextView) view.findViewById(R.id.frag_detail_item_pronu_tv);
 
-        itemKorPronuBtn = (ImageView) view.findViewById(R.id.frag_detail_item_kor_pronu_btn);
-        itemThaiPronuBtn = (ImageView) view.findViewById(R.id.frag_detail_item_thai_pronu_btn);
+        ArrayList<ImageSpan> imageSpans = new ArrayList<ImageSpan>();
 
         if (korThaiDicDto != null) {
-            if (!TextUtil.isNull(korThaiDicDto.getKor()))
-                itemKorTv.setText(korThaiDicDto.getKor());
-            if (!TextUtil.isNull(korThaiDicDto.getThai()))
-                itemThaiTv.setText(korThaiDicDto.getThai());
+            if (!TextUtil.isNull(korThaiDicDto.getKor())) {
+//                itemKorTv.setText(korThaiDicDto.getKor());
+                String korString = korThaiDicDto.getKor();
+                String[] korStrings;
+                korStrings = korString.split(",");
+                splitStrings = new ArrayList<String>();
+
+                for (String st : korStrings) {
+                    DebugUtil.showDebug(st);
+                    if (st.contains("(") && st.contains(")")) {
+                        st = st.replace(st.substring(st.indexOf("("), st.indexOf(")") + 1), "").trim();
+                    }
+                    if (st.contains("(")) {
+                        st = st.replace(st.substring(st.indexOf("("), st.length()), "").trim();
+                    }
+                    if (st.contains(")")) {
+                        st = st.replace(st.substring(0, st.indexOf(")") + 1), "").trim();
+                    }
+                    splitStrings.add(st);
+                }
+
+                for (int i = 0; i < splitStrings.size(); i++) {
+                    appendText(itemKorTv, splitStrings.get(i));
+                    ImageSpan imageSpan = appendDrawable(itemKorTv, R.drawable.frag_btn_headset, i);
+                    imageSpans.add(imageSpan);
+                }
+
+            }
+            if (!TextUtil.isNull(korThaiDicDto.getThai())) {
+//                itemThaiTv.setText(korThaiDicDto.getThai());
+                String thaiString = korThaiDicDto.getThai();
+                String[] thaiStrings;
+                thaiStrings = thaiString.split(",");
+                splitStrings_thai = new ArrayList<String>();
+
+                for (String st : thaiStrings) {
+                    DebugUtil.showDebug(st);
+                    if (st.contains("(") && st.contains(")")) {
+                        st = st.replace(st.substring(st.indexOf("("), st.indexOf(")") + 1), "").trim();
+                    }
+                    if (st.contains("(")) {
+                        st = st.replace(st.substring(st.indexOf("("), st.length()), "").trim();
+                    }
+                    if (st.contains(")")) {
+                        st = st.replace(st.substring(0, st.indexOf(")") + 1), "").trim();
+                    }
+                    splitStrings_thai.add(st);
+                }
+
+                for (int i = 0; i < splitStrings_thai.size(); i++) {
+                    appendText(itemThaiTv, splitStrings_thai.get(i));
+                    ImageSpan imageSpan = appendDrawableThai(itemThaiTv, R.drawable.frag_btn_headset, i);
+                    imageSpans.add(imageSpan);
+                }
+
+            }
             if (!TextUtil.isNull(korThaiDicDto.getPronu()))
                 itemProunTv.setText(Html.fromHtml(korThaiDicDto.getPronu()));
         }
 
-        itemKorPronuBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String[] korStrings;
-                String korString = itemKorTv.getText().toString();
-                String resultString = "";
-                korStrings = korString.split(",");
-                for(String st : korStrings){
-                    DebugUtil.showDebug(st);
-                    if(st.contains("(")){
-                        DebugUtil.showDebug(st.replace(st.substring(st.indexOf("("), st.indexOf(")")), ""));
-                        korString = st.replace(st.substring(st.indexOf("("), st.indexOf(")")+1), "");
-                        resultString += korString +" ,";
-                    } else {
-                        resultString += st;
-                    }
 
-                }
-                korString = korString.replaceAll("()","");
-                DebugUtil.showDebug("DetailItemFrag, 한글 음성이 들어가야할 부분입니다, " + resultString);
-                MainAct.speakOutKor(resultString);
-            }
-        });
-
-        itemThaiPronuBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                DebugUtil.showDebug("DetailItemFrag, 태국어 음성이 들어가야할 부분입니다, " + itemThaiTv.getText());
-                MainAct.speakOutThai(itemThaiTv.getText().toString());
-            }
-        });
+//        itemThaiPronuBtn.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                DebugUtil.showDebug("DetailItemFrag, 태국어 음성이 들어가야할 부분입니다, " + itemThaiTv.getText());
+//                MainAct.speakOutThai(itemThaiTv.getText().toString());
+//            }
+//        });
 
         return view;
+    }
+
+    private ImageSpan appendDrawable(TextView tView, int drawableId, final int index) {
+        final SpannableStringBuilder builder = new SpannableStringBuilder();
+        String THREE_SPACES = "   ";
+        builder.append(THREE_SPACES);
+        Drawable drawable = context.getResources().getDrawable(drawableId);
+        drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
+        final ImageSpan image = new ImageSpan(drawable);
+
+        builder.setSpan(image, 1, 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        builder.setSpan(new ClickableSpan() {
+            final ArrayList<String> finalSplitStrings = splitStrings;
+
+            @Override
+            public void onClick(View widget) {
+                DebugUtil.showDebug("DetailItemFrag, 한글 음성이 들어가야할 부분입니다, " + finalSplitStrings.get(index));
+                MainAct.speakOutKor(" ," + finalSplitStrings.get(index));
+            }
+        }, 1, 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        if(index != splitStrings.size()-1) {
+            builder.append(", ");
+        }
+        tView.append(builder);
+        return image;
+    }
+
+    private ImageSpan appendDrawableThai(TextView tView, int drawableId, final int index) {
+        final SpannableStringBuilder builder = new SpannableStringBuilder();
+        String THREE_SPACES = "   ";
+        builder.append(THREE_SPACES);
+        Drawable drawable = context.getResources().getDrawable(drawableId);
+        drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
+        final ImageSpan image = new ImageSpan(drawable);
+
+        builder.setSpan(image, 1, 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        builder.setSpan(new ClickableSpan() {
+            final ArrayList<String> finalSplitStrings = splitStrings_thai;
+
+            @Override
+            public void onClick(View widget) {
+                DebugUtil.showDebug("DetailItemFrag, 태국 음성이 들어가야할 부분입니다, " + finalSplitStrings.get(index));
+                MainAct.speakOutThai(" ," + finalSplitStrings.get(index));
+            }
+        }, 1, 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        if(index != splitStrings_thai.size()-1) {
+            builder.append(", ");
+        }
+        tView.append(builder);
+        return image;
+    }
+
+    private void appendText(TextView tView, String string) {
+        tView.append(string);
     }
 
     @Override
