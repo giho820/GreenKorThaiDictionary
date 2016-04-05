@@ -10,6 +10,7 @@ import android.speech.tts.UtteranceProgressListener;
 import com.ph.greenkorthaidictionary.util.DebugUtil;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -21,9 +22,27 @@ public class GreenKorThaiDicApplication extends Application implements TextToSpe
     public static GreenKorThaiDicApplication context;
 
     //tts
-    public static TextToSpeech tts;
-    public static TextToSpeech tts_kor;
-    public static boolean doesTtsExists = false; //구글 tts 패키지가 설치되어있는지의 여부를 확인
+    private static TextToSpeech tts;
+    private static TextToSpeech tts_kor;
+    private static Locale localeThai;
+    private static Locale localeKor;
+
+
+    public static TextToSpeech getTtsInstance() {
+        DebugUtil.showDebug("GreenKorThaiDicApplication, getTtsInstance() 호출");
+        if (tts == null) {
+            tts = new TextToSpeech(context, context);
+        }
+        return tts;
+    }
+
+    public static TextToSpeech getTtsKorInstance() {
+        DebugUtil.showDebug("GreenKorThaiDicApplication, getTtsKorInstance() 호출");
+        if (tts_kor == null) {
+            tts_kor = new TextToSpeech(context, context);
+        }
+        return tts;
+    }
 
     public GreenKorThaiDicApplication() {
         super();
@@ -33,62 +52,110 @@ public class GreenKorThaiDicApplication extends Application implements TextToSpe
     public static GreenKorThaiDicApplication getContext() {
         return context;
     }
-    
+
     @Override
     public void onCreate() {
         super.onCreate();
         DebugUtil.showDebug("GreenKorThaiDicApplication onCreate()");
+
+        tts = getTtsInstance();
+        tts_kor = getTtsKorInstance();
     }
 
 
     @Override
     public void onInit(int status) {
-        DebugUtil.showDebug("DetailItemFrag, onInit()");
+        DebugUtil.showDebug("GreenKorThaiDicApplication, onInit()");
         if (status == TextToSpeech.SUCCESS) {
+            DebugUtil.showDebug("GreenKorThaiDicApplication, onInit(), status == TextToSpeech.SUCCESS");
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+
                 GreenKorThaiDicApplication.tts.setEngineByPackageName("com.google.android.tts");
                 GreenKorThaiDicApplication.tts.setLanguage(Locale.forLanguageTag("th"));
 
                 GreenKorThaiDicApplication.tts_kor.setEngineByPackageName("com.google.android.tts");
-//                GreenKorThaiDicApplication.tts_kor.setLanguage(Locale.KOREAN);
-                GreenKorThaiDicApplication.tts_kor.setLanguage(Locale.forLanguageTag("ko"));
+                GreenKorThaiDicApplication.tts_kor.setLanguage(Locale.KOREAN);
 
                 tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
                     @Override
                     public void onDone(String utteranceId) {
-                        DebugUtil.showDebug("GreenKorThaiDicApplication, tts is done()");
+                        DebugUtil.showDebug("say hoho done " + utteranceId);
                     }
 
                     @Override
                     public void onError(String utteranceId) {
+                        DebugUtil.showDebug("say hohoho onError" + utteranceId);
                     }
 
                     @Override
                     public void onStart(String utteranceId) {
+                        DebugUtil.showDebug("say hohoho onStart" + utteranceId);
                     }
                 });
 
-                tts_kor.setOnUtteranceProgressListener(new UtteranceProgressListener() {
-                    @Override
-                    public void onDone(String utteranceId) {
-                        DebugUtil.showDebug("GreenKorThaiDicApplication, tts_kor is done()");
-                    }
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
 
+                int listenerResult = tts.setOnUtteranceCompletedListener(new TextToSpeech.OnUtteranceCompletedListener()
+                {
                     @Override
-                    public void onError(String utteranceId) {
-                    }
-
-                    @Override
-                    public void onStart(String utteranceId) {
+                    public void onUtteranceCompleted(String utteranceId)
+                    {
+                        DebugUtil.showDebug("say hoho done 아이스크림 샌드위치 아래 다 내꺼야" + utteranceId);
                     }
                 });
 
-            } else if (status == TextToSpeech.ERROR) {
+//                setTTS();
+//                setTTS_Kor();
+
+//                GreenKorThaiDicApplication.tts.setEngineByPackageName("com.google.android.tts");
+//                GreenKorThaiDicApplication.tts_kor.setEngineByPackageName("com.google.android.tts");
+
+//                Locale[] locales = Locale.getAvailableLocales();
+//                List<Locale> localeList = new ArrayList<>();
+//                for (Locale locale : locales) {
+//                    int res = GreenKorThaiDicApplication.tts.isLanguageAvailable(locale);
+//                    if (res == TextToSpeech.LANG_COUNTRY_AVAILABLE) {
+//                        localeList.add(locale);
+//                        DebugUtil.showDebug(locale.getLanguage());
+//                        if (locale.getLanguage().equalsIgnoreCase("th")) {
+//                            GreenKorThaiDicApplication.tts.setLanguage(locale);
+//                            DebugUtil.showDebug("MainAct, onInit() th 태국어로 할당 됨");
+//                        }
+//                        if (locale.getLanguage().equalsIgnoreCase("ko")) {
+//                            GreenKorThaiDicApplication.tts_kor.setLanguage(locale);
+//                            DebugUtil.showDebug("MainAct, onInit() kr 한글로 할당 됨");
+//                        }
+//                    }
+//                }
+            } else {
                 DebugUtil.showToast(this, "Sorry! Text To Speech failed...");
-                GreenKorThaiDicApplication.tts.setEngineByPackageName("com.google.android.tts");
-                GreenKorThaiDicApplication.tts_kor.setEngineByPackageName("com.google.android.tts");
-//                tts.setLanguage(Locale.forLanguageTag("th"));
+                //Open Android Text-To-Speech Settings
+                startActivity(Build.VERSION.SDK_INT >= 14 ?
+                        new Intent().setAction("com.android.settings.TTS_SETTINGS").setFlags(Intent.FLAG_ACTIVITY_NEW_TASK) :
+                        new Intent().addCategory(Intent.CATEGORY_LAUNCHER).setComponent(new ComponentName("com.android.settings", "com.android.settings.TextToSpeechSettings")).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
 
+            }
+
+        }
+    }
+
+
+
+    public static HashMap<String, String> setTTS() {
+        HashMap<String, String> map = new HashMap<>();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//            GreenKorThaiDicApplication.tts.speak(_ThaiStringToSpeak, TextToSpeech.QUEUE_FLUSH, null, null);
+            GreenKorThaiDicApplication.tts.setEngineByPackageName("com.google.android.tts");
+            GreenKorThaiDicApplication.tts.setLanguage(Locale.forLanguageTag("th"));
+
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+//            GreenKorThaiDicApplication.tts.speak(_ThaiStringToSpeak, TextToSpeech.QUEUE_FLUSH, map);
+            map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "MessageId");
+            GreenKorThaiDicApplication.tts.setEngineByPackageName("com.google.android.tts");
+
+
+            if(localeThai == null) {
                 Locale[] locales = Locale.getAvailableLocales();
                 List<Locale> localeList = new ArrayList<>();
                 for (Locale locale : locales) {
@@ -98,24 +165,56 @@ public class GreenKorThaiDicApplication extends Application implements TextToSpe
                         DebugUtil.showDebug(locale.getLanguage());
                         if (locale.getLanguage().equalsIgnoreCase("th")) {
                             GreenKorThaiDicApplication.tts.setLanguage(locale);
-                            DebugUtil.showDebug("MainAct, onInit() th 태국어로 할당 됨");
-                        }
-                        if (locale.getLanguage().equalsIgnoreCase("kr")) {
-                            GreenKorThaiDicApplication.tts_kor.setLanguage(locale);
-                            DebugUtil.showDebug("MainAct, onInit() kr 한글로 할당 됨");
+                            localeThai = locale;
+                            DebugUtil.showDebug("GreenKorThaiDicApp, setTTS() th 태국어로 할당 됨");
+                            break;
                         }
                     }
                 }
-
-                //Open Android Text-To-Speech Settings
-                startActivity(Build.VERSION.SDK_INT >= 14 ?
-                        new Intent().setAction("com.android.settings.TTS_SETTINGS").setFlags(Intent.FLAG_ACTIVITY_NEW_TASK) :
-                        new Intent().addCategory(Intent.CATEGORY_LAUNCHER).setComponent(new ComponentName("com.android.settings", "com.android.settings.TextToSpeechSettings")).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
-
             } else {
+                GreenKorThaiDicApplication.tts.setLanguage(localeThai);
+                DebugUtil.showDebug("GreenKorThaiDicApp, setTTS() 이미 Locale 태국어로 할당되어서 저장되어있음");
             }
 
         }
+        return map;
+    }
 
+    public static HashMap<String, String> setTTS_Kor() {
+        HashMap<String, String> map = new HashMap<>();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//            GreenKorThaiDicApplication.tts_kor.speak(_ThaiStringToSpeak, TextToSpeech.QUEUE_FLUSH, null, null);
+            GreenKorThaiDicApplication.tts_kor.setEngineByPackageName("com.google.android.tts");
+            GreenKorThaiDicApplication.tts_kor.setLanguage(Locale.KOREAN);
+
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+//            GreenKorThaiDicApplication.tts_kor.speak(_ThaiStringToSpeak, TextToSpeech.QUEUE_FLUSH, map);
+            map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "MessageId");
+            GreenKorThaiDicApplication.tts_kor.setEngineByPackageName("com.google.android.tts");
+
+            if(localeKor == null) {
+                Locale[] locales = Locale.getAvailableLocales();
+                List<Locale> localeList = new ArrayList<>();
+                for (Locale locale : locales) {
+                    int res = GreenKorThaiDicApplication.tts_kor.isLanguageAvailable(locale);
+                    if (res == TextToSpeech.LANG_COUNTRY_AVAILABLE) {
+                        localeList.add(locale);
+                        DebugUtil.showDebug(locale.getLanguage());
+                        if (locale.getLanguage().equalsIgnoreCase("ko")) {
+                            GreenKorThaiDicApplication.tts_kor.setLanguage(locale);
+                            localeKor = locale;
+                            DebugUtil.showDebug("GreenKorThaiDicApp, setTTS() ko 한글로 할당 됨");
+                            break;
+                        }
+                    }
+                }
+            } else{
+                GreenKorThaiDicApplication.tts_kor.setLanguage(localeKor);
+                DebugUtil.showDebug("GreenKorThaiDicApp, setTTS_Kor() 이미 Locale 한글로 할당되어서 저장되어있음");
+            }
+
+        }
+        return map;
     }
 }

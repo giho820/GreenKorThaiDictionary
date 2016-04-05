@@ -1,6 +1,5 @@
 package com.ph.greenkorthaidictionary.act;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -8,10 +7,8 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.speech.tts.TextToSpeech;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -22,7 +19,6 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.ph.greenkorthaidictionary.GreenKorThaiDicApplication;
 import com.ph.greenkorthaidictionary.ParentAct;
 import com.ph.greenkorthaidictionary.R;
 import com.ph.greenkorthaidictionary.async.DownloadAsync;
@@ -50,7 +46,6 @@ import com.util.Util;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 
 
 public class MainAct extends ParentAct implements NetworkListener, View.OnClickListener, FragListener, BackgroundResultReceiver.Receiver {
@@ -102,6 +97,7 @@ public class MainAct extends ParentAct implements NetworkListener, View.OnClickL
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
 
         // header
@@ -168,6 +164,7 @@ public class MainAct extends ParentAct implements NetworkListener, View.OnClickL
 
         if (checkParams(NetworkConstantUtil.API_IDX._1_GET_SERVICE_INFORMATION))
             request(NetworkConstantUtil.API_IDX._1_GET_SERVICE_INFORMATION);
+
     }
 
     // about lifecycle
@@ -779,102 +776,6 @@ public class MainAct extends ParentAct implements NetworkListener, View.OnClickL
     }
 
 
-    @SuppressLint("NewApi")
-    public static void speakOutThai(String ThaiStringToSpeak) {
-        if (GreenKorThaiDicApplication.tts == null) {
-            DebugUtil.showDebug("tts is null");
-            GreenKorThaiDicApplication.tts = new TextToSpeech(GreenKorThaiDicApplication.context, GreenKorThaiDicApplication.context);
-            HashMap<String, String> map = new HashMap<>();
-            map = setTTS(ThaiStringToSpeak);
-            GreenKorThaiDicApplication.tts.speak(ThaiStringToSpeak, TextToSpeech.QUEUE_FLUSH, map);
-            return;
-        } else if (!TextUtil.isNull(ThaiStringToSpeak)) {
-            HashMap<String, String> map = new HashMap<>();
-            map = setTTS(ThaiStringToSpeak);
-            GreenKorThaiDicApplication.tts.speak(ThaiStringToSpeak, TextToSpeech.QUEUE_FLUSH, map);
-        }
-    }
 
-
-    public static HashMap<String, String> setTTS(String _ThaiStringToSpeak) {
-        HashMap<String, String> map = new HashMap<>();
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            GreenKorThaiDicApplication.tts.speak(_ThaiStringToSpeak, TextToSpeech.QUEUE_FLUSH, null, null);
-            GreenKorThaiDicApplication.tts.setEngineByPackageName("com.google.android.tts");
-            GreenKorThaiDicApplication.tts.setLanguage(Locale.forLanguageTag("th"));
-
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-
-            map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "MessageId");
-            GreenKorThaiDicApplication.tts.setEngineByPackageName("com.google.android.tts");
-//                tts.setLanguage(Locale.forLanguageTag("th_TH"));
-
-            Locale[] locales = Locale.getAvailableLocales();
-            List<Locale> localeList = new ArrayList<>();
-            for (Locale locale : locales) {
-                int res = GreenKorThaiDicApplication.tts.isLanguageAvailable(locale);
-                if (res == TextToSpeech.LANG_COUNTRY_AVAILABLE) {
-                    localeList.add(locale);
-                    DebugUtil.showDebug(locale.getLanguage());
-                    if (locale.getLanguage().equalsIgnoreCase("th")) {
-                        GreenKorThaiDicApplication.tts.setLanguage(locale);
-                        DebugUtil.showDebug("DetailItemFrag, speakOut() th 태국어로 할당 됨");
-                    }
-                }
-            }
-        }
-        return map;
-    }
-
-
-    @SuppressLint("NewApi")
-    public static void speakOutKor(String ThaiStringToSpeak) {
-        if (GreenKorThaiDicApplication.tts_kor == null) {
-            DebugUtil.showDebug("tts_kor is null");
-            GreenKorThaiDicApplication.tts_kor = new TextToSpeech(GreenKorThaiDicApplication.context, GreenKorThaiDicApplication.context);
-            HashMap<String, String> map = new HashMap<>();
-            map = setTTS_Kor(ThaiStringToSpeak);
-            GreenKorThaiDicApplication.tts_kor.speak(ThaiStringToSpeak, TextToSpeech.QUEUE_FLUSH, map);
-            return;
-        } else if (!TextUtil.isNull(ThaiStringToSpeak)) {
-            HashMap<String, String> map = new HashMap<>();
-            map = setTTS_Kor(ThaiStringToSpeak);
-            GreenKorThaiDicApplication.tts_kor.speak(ThaiStringToSpeak, TextToSpeech.QUEUE_FLUSH, map);
-        }
-    }
-
-
-    public static HashMap<String, String> setTTS_Kor(String _ThaiStringToSpeak) {
-        HashMap<String, String> map = new HashMap<>();
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            GreenKorThaiDicApplication.tts_kor.speak(_ThaiStringToSpeak, TextToSpeech.QUEUE_FLUSH, null, null);
-            GreenKorThaiDicApplication.tts_kor.setEngineByPackageName("com.google.android.tts");
-            GreenKorThaiDicApplication.tts_kor.setLanguage(Locale.KOREAN);
-
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-
-            map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "MessageId");
-            GreenKorThaiDicApplication.tts_kor.setEngineByPackageName("com.google.android.tts");
-//                tts.setLanguage(Locale.forLanguageTag("th_TH"));
-//            GreenKorThaiDicApplication.tts_kor.setLanguage(Locale.KOREA);
-
-            Locale[] locales = Locale.getAvailableLocales();
-            List<Locale> localeList = new ArrayList<>();
-            for (Locale locale : locales) {
-                int res = GreenKorThaiDicApplication.tts_kor.isLanguageAvailable(locale);
-                if (res == TextToSpeech.LANG_COUNTRY_AVAILABLE) {
-                    localeList.add(locale);
-                    DebugUtil.showDebug(locale.getLanguage());
-                    if (locale.getLanguage().equalsIgnoreCase("ko")) {
-                        GreenKorThaiDicApplication.tts_kor.setLanguage(locale);
-                        DebugUtil.showDebug("MainAct, setTTS_Kor() 한글로 할당 됨");
-                    }
-                }
-            }
-        }
-        return map;
-    }
 
 }

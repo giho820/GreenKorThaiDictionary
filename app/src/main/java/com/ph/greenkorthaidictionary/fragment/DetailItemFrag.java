@@ -1,7 +1,9 @@
 package com.ph.greenkorthaidictionary.fragment;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.speech.tts.TextToSpeech;
 import android.support.annotation.Nullable;
 import android.text.Html;
 import android.text.Spannable;
@@ -13,16 +15,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
 
+import com.ph.greenkorthaidictionary.GreenKorThaiDicApplication;
 import com.ph.greenkorthaidictionary.ParentAct;
 import com.ph.greenkorthaidictionary.ParentFrag;
 import com.ph.greenkorthaidictionary.R;
-import com.ph.greenkorthaidictionary.act.MainAct;
 import com.ph.greenkorthaidictionary.data.dto.KorThaiDicDto;
 import com.ph.greenkorthaidictionary.listener.FragListener;
 import com.ph.greenkorthaidictionary.util.DebugUtil;
 import com.ph.greenkorthaidictionary.util.TextUtil;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by preparkha on 15. 6. 24..
@@ -43,6 +46,10 @@ public class DetailItemFrag extends ParentFrag {
     private TextView itemKorTv;
     private TextView itemThaiTv;
     private TextView itemProunTv;
+
+    //tts
+    public TextToSpeech ttsThai;
+    public TextToSpeech ttsThaiKor;
 
     ArrayList<String> splitStrings;
     ArrayList<String> splitStrings_thai;
@@ -66,6 +73,13 @@ public class DetailItemFrag extends ParentFrag {
     public void setKorThaiDicDto(KorThaiDicDto korThaiDicDto, Context context) {
         this.korThaiDicDto = korThaiDicDto;
         this.context = context;
+
+        if (ttsThai == null) {
+            ttsThai = GreenKorThaiDicApplication.getTtsInstance();
+        }
+        if (ttsThaiKor == null) {
+            ttsThaiKor = GreenKorThaiDicApplication.getTtsKorInstance();
+        }
     }
 
     @Nullable
@@ -145,16 +159,6 @@ public class DetailItemFrag extends ParentFrag {
             if (!TextUtil.isNull(korThaiDicDto.getPronu()))
                 itemProunTv.setText(Html.fromHtml(korThaiDicDto.getPronu()));
         }
-
-
-//        itemThaiPronuBtn.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                DebugUtil.showDebug("DetailItemFrag, 태국어 음성이 들어가야할 부분입니다, " + itemThaiTv.getText());
-//                MainAct.speakOutThai(itemThaiTv.getText().toString());
-//            }
-//        });
-
         return view;
     }
 
@@ -173,11 +177,12 @@ public class DetailItemFrag extends ParentFrag {
             @Override
             public void onClick(View widget) {
                 DebugUtil.showDebug("DetailItemFrag, 한글 음성이 들어가야할 부분입니다, " + finalSplitStrings.get(index));
-                MainAct.speakOutKor(" ," + finalSplitStrings.get(index));
+                speakOutKor(" ," + finalSplitStrings.get(index));
+//                GreenKorThaiDicApplication.setTTS_Kor(" ," + finalSplitStrings.get(index));
             }
         }, 1, 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
-        if(index != splitStrings.size()-1) {
+        if (index != splitStrings.size() - 1) {
             builder.append(", ");
         }
         tView.append(builder);
@@ -199,11 +204,15 @@ public class DetailItemFrag extends ParentFrag {
             @Override
             public void onClick(View widget) {
                 DebugUtil.showDebug("DetailItemFrag, 태국 음성이 들어가야할 부분입니다, " + finalSplitStrings.get(index));
-                MainAct.speakOutThai(" ," + finalSplitStrings.get(index));
+                speakOutThai(" ," + finalSplitStrings.get(index));
             }
         }, 1, 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
-        if(index != splitStrings_thai.size()-1) {
+        if (parentAct != null) {
+            parentAct.hideLoading();
+        }
+
+        if (index != splitStrings_thai.size() - 1) {
             builder.append(", ");
         }
         tView.append(builder);
@@ -218,4 +227,43 @@ public class DetailItemFrag extends ParentFrag {
     public void refreshFrag() {
 
     }
+
+    @SuppressLint("NewApi")
+    public void speakOutThai(String ThaiStringToSpeak) {
+        HashMap<String, String> map = new HashMap<>();
+        if (ttsThai == null) {
+            DebugUtil.showDebug("DetailItemFrag, speakOutThai(), tts is null");
+            ttsThai = GreenKorThaiDicApplication.getTtsInstance();
+            map = GreenKorThaiDicApplication.setTTS();
+            ttsThai.speak(ThaiStringToSpeak, TextToSpeech.QUEUE_FLUSH, map);
+            return;
+        } else {
+            if (!TextUtil.isNull(ThaiStringToSpeak)) {
+                DebugUtil.showDebug("DetailItemFrag, speakOutThai(), tts is not null");
+                map = GreenKorThaiDicApplication.setTTS();
+                ttsThai.speak(ThaiStringToSpeak, TextToSpeech.QUEUE_FLUSH, map);
+            }
+        }
+    }
+
+
+    @SuppressLint("NewApi")
+    public void speakOutKor(String ThaiStringToSpeak) {
+        HashMap<String, String> map = new HashMap<>();
+        if (ttsThaiKor == null) {
+            DebugUtil.showDebug("DetailItemFrag, speakOutKor(), tts_kor is null");
+            ttsThaiKor = GreenKorThaiDicApplication.getTtsKorInstance();
+            map = GreenKorThaiDicApplication.setTTS_Kor();
+            ttsThaiKor.speak(ThaiStringToSpeak, TextToSpeech.QUEUE_FLUSH, map);
+            return;
+        } else {
+            if (!TextUtil.isNull(ThaiStringToSpeak)) {
+                DebugUtil.showDebug("DetailItemFrag, speakOutKor(), tts_kor is not null");
+                map = GreenKorThaiDicApplication.setTTS_Kor();
+                ttsThaiKor.speak(ThaiStringToSpeak, TextToSpeech.QUEUE_FLUSH, map);
+            }
+        }
+    }
+
+
 }
