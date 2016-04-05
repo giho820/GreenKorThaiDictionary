@@ -775,7 +775,20 @@ public class MainAct extends ParentAct implements NetworkListener, View.OnClickL
         }
     }
 
+<<<<<<< HEAD
 
 
 
+=======
+
+
+
+    public static class TtsThaiListener implements TextToSpeech.OnInitListener {
+        public static int status;
+        @Override
+        public void onInit(int status) {
+            this.status = status;
+        }
+    }
+>>>>>>> origin/master
 }
