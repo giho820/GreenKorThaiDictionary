@@ -27,11 +27,13 @@ public class GreenKorThaiDicApplication extends Application implements TextToSpe
     private static Locale localeThai;
     private static Locale localeKor;
 
+    public static float SPEACH_RATE = 0.6f;
 
     public static TextToSpeech getTtsInstance() {
         DebugUtil.showDebug("GreenKorThaiDicApplication, getTtsInstance() 호출");
         if (tts == null) {
-            tts = new TextToSpeech(context, context);
+            tts = new TextToSpeech(context, context,"com.google.android.tts");
+
         }
         return tts;
     }
@@ -39,7 +41,7 @@ public class GreenKorThaiDicApplication extends Application implements TextToSpe
     public static TextToSpeech getTtsKorInstance() {
         DebugUtil.showDebug("GreenKorThaiDicApplication, getTtsKorInstance() 호출");
         if (tts_kor == null) {
-            tts_kor = new TextToSpeech(context, context);
+            tts_kor = new TextToSpeech(context, context,"com.google.android.tts");
         }
         return tts;
     }
@@ -72,9 +74,13 @@ public class GreenKorThaiDicApplication extends Application implements TextToSpe
 
                 GreenKorThaiDicApplication.tts.setEngineByPackageName("com.google.android.tts");
                 GreenKorThaiDicApplication.tts.setLanguage(Locale.forLanguageTag("th"));
+                //피치 조절 들어갈 부분
+                tts.setSpeechRate(SPEACH_RATE);
 
                 GreenKorThaiDicApplication.tts_kor.setEngineByPackageName("com.google.android.tts");
                 GreenKorThaiDicApplication.tts_kor.setLanguage(Locale.KOREAN);
+                //피치 조절 들어갈 부분
+                tts_kor.setSpeechRate(SPEACH_RATE);
 
                 tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
                     @Override
@@ -142,18 +148,18 @@ public class GreenKorThaiDicApplication extends Application implements TextToSpe
 
 
     public static HashMap<String, String> setTTS() {
-        HashMap<String, String> map = new HashMap<>();
+        HashMap<String, String> hashmap = new HashMap<>();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 //            GreenKorThaiDicApplication.tts.speak(_ThaiStringToSpeak, TextToSpeech.QUEUE_FLUSH, null, null);
             GreenKorThaiDicApplication.tts.setEngineByPackageName("com.google.android.tts");
             GreenKorThaiDicApplication.tts.setLanguage(Locale.forLanguageTag("th"));
-
+            //피치 조절 들어갈 부분
+            tts.setSpeechRate(SPEACH_RATE);
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
 //            GreenKorThaiDicApplication.tts.speak(_ThaiStringToSpeak, TextToSpeech.QUEUE_FLUSH, map);
-            map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "MessageId");
+            hashmap.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "MessageId");
             GreenKorThaiDicApplication.tts.setEngineByPackageName("com.google.android.tts");
-
 
             if(localeThai == null) {
                 Locale[] locales = Locale.getAvailableLocales();
@@ -175,22 +181,24 @@ public class GreenKorThaiDicApplication extends Application implements TextToSpe
                 GreenKorThaiDicApplication.tts.setLanguage(localeThai);
                 DebugUtil.showDebug("GreenKorThaiDicApp, setTTS() 이미 Locale 태국어로 할당되어서 저장되어있음");
             }
-
+            //피치 조절 들어갈 부분
+            tts.setSpeechRate(SPEACH_RATE);
         }
-        return map;
+        return hashmap;
     }
 
     public static HashMap<String, String> setTTS_Kor() {
-        HashMap<String, String> map = new HashMap<>();
+        HashMap<String, String> hashmap = new HashMap<>();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 //            GreenKorThaiDicApplication.tts_kor.speak(_ThaiStringToSpeak, TextToSpeech.QUEUE_FLUSH, null, null);
             GreenKorThaiDicApplication.tts_kor.setEngineByPackageName("com.google.android.tts");
             GreenKorThaiDicApplication.tts_kor.setLanguage(Locale.KOREAN);
-
+//피치 조절 들어갈 부분
+            tts_kor.setSpeechRate(SPEACH_RATE);
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
 //            GreenKorThaiDicApplication.tts_kor.speak(_ThaiStringToSpeak, TextToSpeech.QUEUE_FLUSH, map);
-            map.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "MessageId");
+            hashmap.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "MessageId");
             GreenKorThaiDicApplication.tts_kor.setEngineByPackageName("com.google.android.tts");
 
             if(localeKor == null) {
@@ -214,7 +222,10 @@ public class GreenKorThaiDicApplication extends Application implements TextToSpe
                 DebugUtil.showDebug("GreenKorThaiDicApp, setTTS_Kor() 이미 Locale 한글로 할당되어서 저장되어있음");
             }
 
+            //피치 조절 들어갈 부분
+            tts_kor.setSpeechRate(SPEACH_RATE);
+
         }
-        return map;
+        return hashmap;
     }
 }

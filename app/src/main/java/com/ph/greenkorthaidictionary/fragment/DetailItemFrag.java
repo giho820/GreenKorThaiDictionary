@@ -108,7 +108,6 @@ public class DetailItemFrag extends ParentFrag {
                 splitStrings = new ArrayList<String>();
 
                 for (String st : korStrings) {
-                    DebugUtil.showDebug(st);
                     if (st.contains("(") && st.contains(")")) {
                         st = st.replace(st.substring(st.indexOf("("), st.indexOf(")") + 1), "").trim();
                     }
@@ -118,7 +117,9 @@ public class DetailItemFrag extends ParentFrag {
                     if (st.contains(")")) {
                         st = st.replace(st.substring(0, st.indexOf(")") + 1), "").trim();
                     }
-                    splitStrings.add(st);
+                    if (!st.equals("")){
+                        splitStrings.add(st);
+                    }
                 }
 
                 for (int i = 0; i < splitStrings.size(); i++) {
@@ -136,7 +137,6 @@ public class DetailItemFrag extends ParentFrag {
                 splitStrings_thai = new ArrayList<String>();
 
                 for (String st : thaiStrings) {
-                    DebugUtil.showDebug(st);
                     if (st.contains("(") && st.contains(")")) {
                         st = st.replace(st.substring(st.indexOf("("), st.indexOf(")") + 1), "").trim();
                     }
@@ -146,7 +146,9 @@ public class DetailItemFrag extends ParentFrag {
                     if (st.contains(")")) {
                         st = st.replace(st.substring(0, st.indexOf(")") + 1), "").trim();
                     }
-                    splitStrings_thai.add(st);
+                    if (!st.equals("")){
+                        splitStrings_thai.add(st);
+                    }
                 }
 
                 for (int i = 0; i < splitStrings_thai.size(); i++) {
