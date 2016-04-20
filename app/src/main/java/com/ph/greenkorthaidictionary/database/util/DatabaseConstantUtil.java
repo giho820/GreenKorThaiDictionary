@@ -5,7 +5,7 @@ package com.ph.greenkorthaidictionary.database.util;
  */
 public class DatabaseConstantUtil {
 
-    public static final String DATABASE_SPLITE_NAME = "ThaiKorDictionary_SEARCH_T_20160316.sqlite";
+    public static final String DATABASE_SPLITE_NAME = "ThaiKorDictionary_SEARCH_P_20160414.sqlite";
 //    public static final String DATABASE_SPLITE_NAME = "ThaiKorDictionary_SEARCH_P_20151007.sqlite";
     public static final String DATABASE_DB_NAME = "ThaiKorDic.db";
     public static final String PAKAGE_NAME = "com.ph.greenkorthaidictionary";
@@ -18,6 +18,6 @@ public class DatabaseConstantUtil {
     public static final String COLUMN_NAME_KOREAN = "KOREAN";
     public static final String COLUMN_NAME_SEARCH_PRONUNCIATION = "SEARCH_PRONUNCIATION";
 
-    public static int DATABASE_VERSION = 16;
+    public static int DATABASE_VERSION = 20;
 
 }

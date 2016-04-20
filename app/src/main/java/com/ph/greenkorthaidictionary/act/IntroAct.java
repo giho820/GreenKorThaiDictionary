@@ -71,7 +71,7 @@ public class IntroAct extends ParentAct implements NetworkListener{
 
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Check License");
-        DatabaseConstantUtil.DATABASE_VERSION = 16;
+        DatabaseConstantUtil.DATABASE_VERSION = 20;
 
         // (debug)
         setBase();
