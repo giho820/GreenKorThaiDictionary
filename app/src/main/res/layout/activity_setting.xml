@@ -51,7 +51,7 @@
             android:layout_gravity="right|center_vertical"
             android:layout_marginRight="@dimen/dp_16"
             android:alpha="0.87"
-            android:text="v.2.0.0"
+            android:text="v.2.0.5"
             android:textColor="@color/c_000000"
             android:textSize="@dimen/dp_19" />
     </FrameLayout>

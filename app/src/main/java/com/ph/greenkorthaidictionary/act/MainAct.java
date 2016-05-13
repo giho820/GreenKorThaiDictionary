@@ -337,7 +337,8 @@ public class MainAct extends ParentAct implements NetworkListener, View.OnClickL
      */
     private void initializeUI() {
         DebugUtil.showDebug("initializeUI");
-        et.setText("");
+//        et.setText("");
+        et.getText().clear();
         if (bodyFl.getChildCount() > 0)
             bodyFl.removeAllViews();
         hideKeyboard(et);

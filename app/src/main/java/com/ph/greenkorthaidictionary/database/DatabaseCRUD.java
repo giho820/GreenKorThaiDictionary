@@ -89,10 +89,15 @@ public class DatabaseCRUD {
         korThaiDicDto.setKor(cursor.getString(cursor.getColumnIndex(DatabaseConstantUtil.COLUMN_NAME_KOREAN)));
         korThaiDicDto.setThai(cursor.getString(cursor.getColumnIndex(DatabaseConstantUtil.COLUMN_NAME_THAI)));
         String tempPronu = cursor.getString(cursor.getColumnIndex(DatabaseConstantUtil.COLUMN_NAME_PRONUNCIATION));
-        String pronu = tempPronu.replaceAll(keyword, "<b>" + keyword + "</b>");
-        korThaiDicDto.setPronu(pronu);
+        String pronu = "";
+        try{
+            pronu = tempPronu.replaceAll(keyword, "<b>" + keyword + "</b>");
+            korThaiDicDto.setPronu(pronu);
+        } catch (Exception e) {
+            DebugUtil.showDebug("Exception :: " + e.getMessage());
+        }
 
-        //DebugUtil.showDebug("row : " + korThaiDicDto.toString());
+        DebugUtil.showDebug("row : " + korThaiDicDto.toString());
 
         list.add(korThaiDicDto);
 
@@ -105,7 +110,7 @@ public class DatabaseCRUD {
             pronu = tempPronu.replaceAll(keyword, "<b>" + keyword + "</b>");
             korThaiDicDto.setPronu(pronu);
 
-            //DebugUtil.showDebug("row : " + korThaiDicDto.toString());
+            DebugUtil.showDebug("row : " + korThaiDicDto.toString());
 
             list.add(korThaiDicDto);
 

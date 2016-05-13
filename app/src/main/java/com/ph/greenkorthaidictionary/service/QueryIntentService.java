@@ -16,7 +16,7 @@ import java.util.ArrayList;
 /**
  * Created by preparkha on 15. 6. 28..
  */
-public class QueryIntentService extends IntentService{
+public class QueryIntentService extends IntentService {
 
     public static final int STATUS_RUNNING = 0;
     public static final int STATUS_FINISHED = 1;
@@ -65,50 +65,75 @@ public class QueryIntentService extends IntentService{
         for (int i = 0; i < keyword.length(); i++) {
             char tempChar = keyword.charAt(i);
             int tempInt = (int) tempChar;
-            if(tempInt == 39) {
+            if (tempInt == 39) {
                 DebugUtil.showDebug("keyword include ''.");
                 return null;
             }
         }
 
         ArrayList<KorThaiDicDto> korThaiDicDtoList;
-
         DatabaseHelper databaseHelper = DatabaseHelper.getInstacnce(this.getApplicationContext());
 
-        if(keyword.length() > 1 && keyword.charAt(0) == '*' ){
-            String reFormKeyword = keyword.substring(1, keyword.length());
-            DebugUtil.showDebug("whild / " + reFormKeyword);
+        if (keyword.length() > 1 && keyword.charAt(0) == '*') {
+            String reformKeyword = keyword.substring(1, keyword.length());
+            DebugUtil.showDebug("whild / " + reformKeyword);
 
             String thirdQuery = "SELECT "
                     + DatabaseConstantUtil.COLUMN_NAME_KOREAN + ", "
                     + DatabaseConstantUtil.COLUMN_NAME_THAI + ", "
                     + DatabaseConstantUtil.COLUMN_NAME_PRONUNCIATION + " "
                     + "FROM " + DatabaseConstantUtil.TABLE_KOR_THAI_NAME + " "
-                    + "WHERE TRIM(" + DatabaseConstantUtil.COLUMN_NAME_PRONUNCIATION + ") LIKE '%" + reFormKeyword + "%'" + " ESCAPE '/' "
+                    + "WHERE TRIM(" + DatabaseConstantUtil.COLUMN_NAME_PRONUNCIATION + ") LIKE '%/" + reformKeyword + "/%'" + " ESCAPE '/' "
                     + "LIMIT " + start + ", " + limit;
 //                + "AND LIMIT " + start + ", " + limit
 //                + "AND IDX LIMIT " + start + ", " + limit;
             DebugUtil.showDebug(thirdQuery);
 
-            korThaiDicDtoList = DatabaseCRUD.selectListDb(databaseHelper, thirdQuery, reFormKeyword);
+            korThaiDicDtoList = DatabaseCRUD.selectListDb(databaseHelper, thirdQuery, reformKeyword);
 
             return korThaiDicDtoList;
         }
+
+        String reformKeyword2 = doReFormKeyword(keyword);
+//        String reformKeyword = keyword;
 
         String secondQuery = "SELECT "
                 + DatabaseConstantUtil.COLUMN_NAME_KOREAN + ", "
                 + DatabaseConstantUtil.COLUMN_NAME_THAI + ", "
                 + DatabaseConstantUtil.COLUMN_NAME_PRONUNCIATION + " "
                 + "FROM " + DatabaseConstantUtil.TABLE_KOR_THAI_NAME + " "
-                + "WHERE TRIM(" + DatabaseConstantUtil.COLUMN_NAME_PRONUNCIATION + ") LIKE '" + keyword + "%'" + " "
+                + "WHERE TRIM(" + DatabaseConstantUtil.COLUMN_NAME_PRONUNCIATION + ") LIKE '" + reformKeyword2 + "%'" + " "
                 + "LIMIT " + start + ", " + limit;
 //                + "AND LIMIT " + start + ", " + limit
 //                + "AND IDX LIMIT " + start + ", " + limit;
         DebugUtil.showDebug(secondQuery);
 
-        korThaiDicDtoList = DatabaseCRUD.selectListDb(databaseHelper, secondQuery, keyword);
+        korThaiDicDtoList = DatabaseCRUD.selectListDb(databaseHelper, secondQuery, reformKeyword2);
 
         return korThaiDicDtoList;
+    }
+
+    public static String doReFormKeyword(String keyword) {
+        String reformKeyword = "";
+        String temp;
+        for (int i = 0; i < keyword.length(); i++) {
+            char tempChar = keyword.charAt(i);
+            int tempInt = (int) tempChar;
+            DebugUtil.showDebug("tempChar: " + tempChar + ", tempInt ::" + tempInt);
+            if (tempInt == 39) {
+                DebugUtil.showDebug("keyword include ''.");
+                return null;
+            }
+            if ((tempInt > 32 && tempInt <45 || tempInt > 45 && tempInt < 48) || (tempInt > 57 && tempInt < 65) || (tempInt > 90 && tempInt < 97) || (tempInt > 122 && tempInt < 128)) {
+                DebugUtil.showDebug("debug : " + tempChar + "(special character)");
+                temp = "/" + tempChar;
+            } else {
+                temp = "" + tempChar;
+            }
+            reformKeyword += temp;
+            DebugUtil.showDebug("debug : " + reformKeyword);
+        }
+        return reformKeyword;
     }
 
 }

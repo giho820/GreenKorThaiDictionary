@@ -7,10 +7,13 @@ import android.content.DialogInterface;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.Settings;
 
+import com.google.android.vending.licensing.AESObfuscator;
 import com.google.android.vending.licensing.LicenseChecker;
 import com.google.android.vending.licensing.LicenseCheckerCallback;
 import com.google.android.vending.licensing.Policy;
+import com.google.android.vending.licensing.ServerManagedPolicy;
 import com.ph.greenkorthaidictionary.ParentAct;
 import com.ph.greenkorthaidictionary.R;
 import com.ph.greenkorthaidictionary.data.dto.ServiceInfoDto;
@@ -25,6 +28,7 @@ import com.ph.greenkorthaidictionary.network.listener.NetworkListener;
 import com.ph.greenkorthaidictionary.network.util.NetworkConstantUtil;
 import com.ph.greenkorthaidictionary.util.DebugUtil;
 import com.ph.greenkorthaidictionary.util.KorThaiDicConstantUtil;
+import com.ph.greenkorthaidictionary.util.KorThaiDicUtil;
 import com.ph.greenkorthaidictionary.util.MoveActUtil;
 import com.ph.greenkorthaidictionary.util.SharedPreUtil;
 import com.ph.greenkorthaidictionary.util.TextUtil;
@@ -71,29 +75,29 @@ public class IntroAct extends ParentAct implements NetworkListener{
 
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Check License");
-        DatabaseConstantUtil.DATABASE_VERSION = 20;
+        DatabaseConstantUtil.DATABASE_VERSION = 21;
 
         // (debug)
-        setBase();
+//        setBase();
 
-//        // 라이센스 인증 여부는 내부 프리퍼런스로 저장을 해서 판단한다. (release)
-//        if (KorThaiDicUtil.GetShareIntData(this, KorThaiDicConstantUtil.KEY_SHARED_PREFERENCE.CHECK_LICENSE) != 1) {
-//            //인증을 받지 못한 경우
-//            progressDialog.show();
-//            mHandler = new Handler();
-//            mLicenseCheckerCallback = new MyLicenseCheckerCallback();
-//            deviceId = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
-//            mChecker = new LicenseChecker(this, new ServerManagedPolicy(this, new AESObfuscator(SALT, getPackageName(), deviceId)), BASE64_PUBLIC_KEY);
-//            mChecker.checkAccess(mLicenseCheckerCallback);
-//        } else {
-//            //SharedPreUtil.getInstance().putPreference(KorThaiDicConstantUtil.KEY_SHARED_PREFERENCE.CHECK_DATABASE, 1);
-//
-////        if (SharedPreUtil.getInstance().getIntPreference(KorThaiDicConstantUtil.KEY_SHARED_PREFERENCE.CHECK_DATABASE) != 0)
-////            DatabaseConstantUtil.setDatabaseVersion(SharedPreUtil.getInstance().getIntPreference(KorThaiDicConstantUtil.KEY_SHARED_PREFERENCE.CHECK_DATABASE));
-//
-//
-//            setBase();
-//        }
+        // 라이센스 인증 여부는 내부 프리퍼런스로 저장을 해서 판단한다. (release)
+        if (KorThaiDicUtil.GetShareIntData(this, KorThaiDicConstantUtil.KEY_SHARED_PREFERENCE.CHECK_LICENSE) != 1) {
+            //인증을 받지 못한 경우
+            progressDialog.show();
+            mHandler = new Handler();
+            mLicenseCheckerCallback = new MyLicenseCheckerCallback();
+            deviceId = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
+            mChecker = new LicenseChecker(this, new ServerManagedPolicy(this, new AESObfuscator(SALT, getPackageName(), deviceId)), BASE64_PUBLIC_KEY);
+            mChecker.checkAccess(mLicenseCheckerCallback);
+        } else {
+            //SharedPreUtil.getInstance().putPreference(KorThaiDicConstantUtil.KEY_SHARED_PREFERENCE.CHECK_DATABASE, 1);
+
+//        if (SharedPreUtil.getInstance().getIntPreference(KorThaiDicConstantUtil.KEY_SHARED_PREFERENCE.CHECK_DATABASE) != 0)
+//            DatabaseConstantUtil.setDatabaseVersion(SharedPreUtil.getInstance().getIntPreference(KorThaiDicConstantUtil.KEY_SHARED_PREFERENCE.CHECK_DATABASE));
+
+
+            setBase();
+        }
 
     }
 
